@@ -33,8 +33,6 @@ export class AiChatService {
                 response: `This is a dummy response to your message: "${chatRequest.message}"`
             };
 
-            await new Promise(resolve => setTimeout(resolve, 500));
-
             return new BaseResponse<ChatResponseDto>(
                 dummyResponse,
                 ResponseMessages.SUCCESS,
