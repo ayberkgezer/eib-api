@@ -1,0 +1,15 @@
+export enum ResponseMessages {
+    SUCCESS = 'Success',
+    ERROR = 'Error',
+    NOT_FOUND = 'Not Found',
+    INVALID_INPUT = 'Invalid Input',
+    UNAUTHORIZED = 'Unauthorized',
+    FORBIDDEN = 'Forbidden',
+    INTERNAL_SERVER_ERROR = 'Internal Server Error',
+    BAD_REQUEST = 'Bad Request',
+    CONFLICT = 'Conflict',
+    UNPROCESSABLE_ENTITY = 'Unprocessable Entity',
+    GONE = 'Gone',
+    BAD_GATEWAY = 'Bad Gateway',
+    REQUEST_TIMEOUT = 'Request Timeout',
+}
