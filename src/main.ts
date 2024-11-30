@@ -1,47 +1,41 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './common/exceptions/http.exception.filter';
-import { ValidationPipe, BadRequestException, ValidationError, Logger } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { APP_CONSTANTS } from './common/constant/app.constant';
+import { HttpExceptionFilter } from './common/exceptions/http.exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'debug', 'verbose']
+    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
   });
 
-  const logger = new Logger('Validation');
-
+  // Validation pipe
   app.useGlobalPipes(new ValidationPipe({
-    exceptionFactory: (errors: ValidationError[]) => {
-      const findFirstError = (errors: ValidationError[]) => {
-        for (const error of errors) {
-          if (error.constraints) {
-            logger.error(`Validation failed: ${JSON.stringify(error.constraints)}`);
-            return Object.values(error.constraints)[0];
-          }
-        }
-      }
-      const firstError = findFirstError(errors);
-      logger.error(`Bad Request: ${firstError}`);
-      return new BadRequestException(firstError);
-    },
     whitelist: true,
     forbidNonWhitelisted: true,
-    transform: true
+    transform: true,
   }));
 
+  // Exception filter
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  //Swagger
+  // Swagger
   const config = new DocumentBuilder()
     .setTitle('NestJS EIB API')
     .setDescription('The EIB AI API description')
     .setVersion('0.1')
-    .addTag('api')
+    .addApiKey({ type: 'apiKey', name: 'x-api-key', in: 'header' }, 'x-api-key')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3000);
+  // Start the application
+  const port = process.env.PORT || APP_CONSTANTS.DEFAULT_PORT;
+  await app.listen(port);
+
+  const logger = new Logger('Bootstrap');
+  logger.log(`Application is running on: ${await app.getUrl()}`);
+  logger.log(`Environment: ${process.env.NODE_ENV}`);
 }
 bootstrap();
