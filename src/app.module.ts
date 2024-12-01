@@ -14,7 +14,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
       isGlobal: true,
       load: [configuration],
       envFilePath: process.env.NODE_ENV === 'production'
-        ? 'prod.env'
+        ? '.env'
         : 'dev.env',
     }),
     AiChatModule

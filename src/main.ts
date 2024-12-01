@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { APP_CONSTANTS } from './common/constant/app.constant';
 import { HttpExceptionFilter } from './common/exceptions/http.exception.filter';
 
 async function bootstrap() {
@@ -31,7 +30,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   // Start the application
-  const port = process.env.PORT || APP_CONSTANTS.DEFAULT_PORT;
+  const port = process.env.PORT;
   await app.listen(port);
 
   const logger = new Logger('Bootstrap');
