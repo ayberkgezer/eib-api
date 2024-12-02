@@ -3,6 +3,7 @@ import { AiChatRequestDto } from './dto/request/ai-chat.request.dto';
 import { ChatResponseDto } from './dto/respond/ai-chat.respond.dto';
 import { BaseResponse } from 'src/base/base.response';
 import { ResponseMessages } from 'src/common/enums/response.messages.enum';
+import { sendMessage } from './ai-api-post/ai-chat.api';
 
 @Injectable()
 export class AiChatService {
@@ -29,12 +30,10 @@ export class AiChatService {
             }
 
             // Normal success case
-            const dummyResponse: ChatResponseDto = {
-                response: `This is a dummy response to your message: "${chatRequest.message}"`
-            };
+            const response: ChatResponseDto = await sendMessage(chatRequest.message);
 
             return new BaseResponse<ChatResponseDto>(
-                dummyResponse,
+                response,
                 ResponseMessages.SUCCESS,
                 true,
                 HttpStatus.OK
