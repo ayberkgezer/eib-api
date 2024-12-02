@@ -5,50 +5,45 @@ import { ResponseMessages } from "../enums/response.messages.enum";
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
+
     catch(exception: HttpException, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse();
+        //const request = ctx.getRequest();
         const status = exception.getStatus();
-
-        let errorMessage: string;
 
         const prefixList: DtoPrefix[] = Object.values(DtoPrefix);
         const validationType = prefixList.find((prefix) => {
             return exception.message && exception.message.includes(prefix);
         });
 
+        let responseMessage: string;
+
         if (validationType) {
-            errorMessage = exception.message;
+            responseMessage = `${ResponseMessages.VALIDATION_ERROR}: ${exception.message}`;
+            response.set('validation-type', exception.message);
         } else {
-            switch (status) {
-                case HttpStatus.UNAUTHORIZED:
-                    errorMessage = ResponseMessages.UNAUTHORIZED;
-                    break;
-                case HttpStatus.BAD_REQUEST:
-                    errorMessage = `${ResponseMessages.BAD_REQUEST}: ${exception.message}`;
-                    break;
-                case HttpStatus.NOT_FOUND:
-                    errorMessage = ResponseMessages.NOT_FOUND;
-                    break;
-                case HttpStatus.REQUEST_TIMEOUT:
-                    errorMessage = ResponseMessages.REQUEST_TIMEOUT;
-                    break;
-                case HttpStatus.INTERNAL_SERVER_ERROR:
-                    errorMessage = ResponseMessages.INTERNAL_SERVER_ERROR;
-                    break;
-                default:
-                    errorMessage = `${ResponseMessages.BAD_GATEWAY} | ${exception.message}`;
-                    break;
-            }
+            responseMessage = this.getDefaultErrorMessage(status, exception.message);
         }
 
         response.status(status).json(
-            new BaseResponse(
-                null,
-                errorMessage,
-                false,
-                status
-            )
+            new BaseResponse(null, responseMessage, false, status)
         );
+    }
+    private getDefaultErrorMessage(status: number, message: string): string {
+        switch (status) {
+            case HttpStatus.BAD_REQUEST:
+                return `${ResponseMessages.BAD_REQUEST}: ${message}`;
+            case HttpStatus.NOT_FOUND:
+                return ResponseMessages.NOT_FOUND;
+            case HttpStatus.REQUEST_TIMEOUT:
+                return ResponseMessages.REQUEST_TIMEOUT;
+            case HttpStatus.INTERNAL_SERVER_ERROR:
+                return ResponseMessages.INTERNAL_SERVER_ERROR;
+            case HttpStatus.UNAUTHORIZED:
+                return ResponseMessages.UNAUTHORIZED;
+            default:
+                return `${ResponseMessages.BAD_GATEWAY} | ${message}`;
+        }
     }
 }

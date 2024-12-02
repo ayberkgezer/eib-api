@@ -1,22 +1,34 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe, Logger } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { HttpExceptionFilter } from './common/exceptions/http.exception.filter';
+import { ValidationPipe, BadRequestException, ValidationError, Logger } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+    logger: ['error', 'warn', 'log', 'debug', 'verbose']
   });
 
-  // Validation pipe
+
   app.useGlobalPipes(new ValidationPipe({
+    exceptionFactory: (errors: ValidationError[]) => {
+      const findFirstError = (errors: ValidationError[]) => {
+        for (const error of errors) {
+          if (error.constraints) {
+            return Object.values(error.constraints)[0];
+          }
+        }
+      }
+      const firstError = findFirstError(errors);
+      return new BadRequestException(firstError);
+    },
     whitelist: true,
     forbidNonWhitelisted: true,
-    transform: true,
+    transform: true
   }));
 
-  // Exception filter
+
+  // Exception filter Global
   app.useGlobalFilters(new HttpExceptionFilter());
 
   // Swagger
