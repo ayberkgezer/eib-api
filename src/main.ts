@@ -4,6 +4,7 @@ import { HttpExceptionFilter } from './common/exceptions/http.exception.filter';
 import { ValidationPipe, BadRequestException, ValidationError, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log', 'debug', 'verbose']
@@ -46,6 +47,8 @@ async function bootstrap() {
   await app.listen(port);
 
   const logger = new Logger('Bootstrap');
+
+  logger.log(`Database connection: Successful`);
   logger.log(`Application is running on: ${await app.getUrl()}`);
   logger.log(`Environment: ${process.env.NODE_ENV}`);
 }

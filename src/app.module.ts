@@ -6,6 +6,8 @@ import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import { ApiKeyMiddleware } from './common/middleware/api-key.middleware';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { DatabaseModule } from './modules/database/database.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -16,7 +18,18 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
         ? '.env'
         : 'dev.env',
     }),
-    AiChatModule
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST,
+      port: +process.env.DB_PORT,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true, //!process production false
+    }),
+    //Modules Import
+    AiChatModule, DatabaseModule
   ],
   controllers: [AppController],
   providers: [AppService],
