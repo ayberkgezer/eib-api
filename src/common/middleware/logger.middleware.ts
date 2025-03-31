@@ -21,12 +21,14 @@ export class LoggerMiddleware implements NestMiddleware {
           `${method} ${originalUrl} ${statusCode} ${contentLength} - ${responseTime}ms ${userAgent} - ${ip}`,
         );
       } else if (statusCode == 400) {
-        //400 Error
+        //400 Error Bad Request
         if (validationType) {
+          //Validation Error
           this.logger.error(
             `${method} ${originalUrl} ${statusCode} ${contentLength} - ${responseTime}ms ${userAgent} - ${ip} - ${validationType}`,
           );
         } else {
+          //Normal 400 Error
           this.logger.error(
             `${method} ${originalUrl} ${statusCode} ${contentLength} - ${responseTime}ms ${userAgent} - ${ip}`,
           );

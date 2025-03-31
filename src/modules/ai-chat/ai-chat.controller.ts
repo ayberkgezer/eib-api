@@ -6,7 +6,7 @@ import { BaseResponse } from 'src/base/base.response';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('AI Chat')
-@Controller('ai-chat')
+@Controller({ path: 'ai-chat', version: '1' })
 export class AiChatController {
     constructor(private readonly aiChatService: AiChatService) { }
 

@@ -3,45 +3,30 @@ import { AiChatRequestDto } from './dto/request/ai-chat.request.dto';
 import { ChatResponseDto } from './dto/respond/ai-chat.respond.dto';
 import { BaseResponse } from 'src/base/base.response';
 import { ResponseMessages } from 'src/common/enums/response.messages.enum';
-import { sendMessage } from './ai-api-post/ai-chat.api';
+//import { sendMessage } from './ai-api-post/ai-chat.api';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()
 export class AiChatService {
   private readonly logger = new Logger(AiChatService.name);
 
-  constructor(private databaseService: DatabaseService) { }
+  constructor(private databaseService: DatabaseService) {}
 
   async processChat(
     chatRequest: AiChatRequestDto,
   ): Promise<BaseResponse<ChatResponseDto>> {
     try {
-      // Simulate different error scenarios based on message content
-      if (chatRequest.message.includes('trigger500')) {
-        throw new Error('Simulated internal server error');
-      }
-
-      if (chatRequest.message.includes('triggerNull')) {
-        const nullObject: any = null;
-        throw new Error(nullObject);
-      }
-
-      if (chatRequest.message.includes('triggerTimeout')) {
-        this.logger.log('Triggering timeout simulation');
-        throw new HttpException('Request Timeout', HttpStatus.REQUEST_TIMEOUT);
-      }
-
-      // Normal success case
-      const startSendMessageTime = Date.now(); // sendMessage başlangıç zamanını al
-      const response: ChatResponseDto = await sendMessage(chatRequest.message);
-      const endSendMessageTime = Date.now(); // sendMessage bitiş zamanını al
-      console.log(`AI api süresi sendMessage süresi: ${endSendMessageTime - startSendMessageTime} ms`); // Süreyi yazdır
+      // Send message to AI-Chat API
+      //const response: ChatResponseDto = await sendMessage(chatRequest.message);
+      const response: ChatResponseDto = {
+        response: 'Bu bir test yanıtıdır. AI sistem çalışıyor.',
+      };
 
       // Save message to database
-      const startSaveMessageTime = Date.now(); // saveMessage başlangıç zamanını al
-      await this.databaseService.saveMessage(chatRequest.message, response.response);
-      const endSaveMessageTime = Date.now(); // saveMessage bitiş zamanını al
-      console.log(`Database kaydetme saveMessage süresi: ${endSaveMessageTime - startSaveMessageTime} ms`); // Süreyi yazdır
+      await this.databaseService.saveMessage(
+        chatRequest.message,
+        response.response,
+      );
 
       // Return response
       return new BaseResponse<ChatResponseDto>(

@@ -1,33 +1,37 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/exceptions/http.exception.filter';
-import { ValidationPipe, BadRequestException, ValidationError, Logger } from '@nestjs/common';
+import {
+  ValidationPipe,
+  BadRequestException,
+  ValidationError,
+  Logger,
+} from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'debug', 'verbose']
+    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
   });
 
-
-  app.useGlobalPipes(new ValidationPipe({
-    exceptionFactory: (errors: ValidationError[]) => {
-      const findFirstError = (errors: ValidationError[]) => {
-        for (const error of errors) {
-          if (error.constraints) {
-            return Object.values(error.constraints)[0];
+  app.useGlobalPipes(
+    new ValidationPipe({
+      exceptionFactory: (errors: ValidationError[]) => {
+        const findFirstError = (errors: ValidationError[]) => {
+          for (const error of errors) {
+            if (error.constraints) {
+              return Object.values(error.constraints)[0];
+            }
           }
-        }
-      }
-      const firstError = findFirstError(errors);
-      return new BadRequestException(firstError);
-    },
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true
-  }));
-
+        };
+        const firstError = findFirstError(errors);
+        return new BadRequestException(firstError);
+      },
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   // Exception filter Global
   app.useGlobalFilters(new HttpExceptionFilter());
@@ -46,10 +50,12 @@ async function bootstrap() {
   const port = process.env.PORT;
   await app.listen(port);
 
-  const logger = new Logger('Bootstrap');
+  if (process.env.NODE_ENV === 'development') {
+    const logger = new Logger('Bootstrap');
 
-  logger.log(`Database connection: Successful`);
-  logger.log(`Application is running on: ${await app.getUrl()}`);
-  logger.log(`Environment: ${process.env.NODE_ENV}`);
+    logger.log(`Database connection: Successful`);
+    logger.log(`Application is running on: ${await app.getUrl()}`);
+    logger.log(`Environment: ${process.env.NODE_ENV}`);
+  }
 }
 bootstrap();

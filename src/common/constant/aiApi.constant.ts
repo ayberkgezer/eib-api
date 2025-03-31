@@ -1,1 +1,0 @@
-export const AI_API_URL: string = 'https://eib-api-test.aygemlabs.site/chat';

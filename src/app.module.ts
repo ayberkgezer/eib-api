@@ -14,9 +14,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
-      envFilePath: process.env.NODE_ENV === 'production'
-        ? '.env'
-        : 'dev.env',
+      envFilePath: process.env.NODE_ENV === 'production' ? '.env' : 'dev.env',
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -29,7 +27,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       synchronize: true, //!process production false
     }),
     //Modules Import
-    AiChatModule, DatabaseModule
+    AiChatModule,
+    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
